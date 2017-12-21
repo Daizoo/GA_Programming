@@ -105,7 +105,7 @@ def main(genomLength, population, maxChange, perMutation_G, perMutaiton_I,
         print("第", count_, "世代の結果\n")
         print("Max:", Max, "\n")
         print("Min:", Min, "\n")
-        print("Ave:%", Ave, "\n")
+        print("Ave:", Ave, "\n")
         currentGroup = nextGroup
 
     print("最優秀個体:")
