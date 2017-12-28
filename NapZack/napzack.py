@@ -6,9 +6,8 @@ import random as rand
 
 
 def createBaggage(number, maxWeight, maxValue):
-
     baggageData = []
-    for i in range(1, number+1):
+    for i in range(1, number + 1):
         baggageData.append(
             bo.baggage(rand.randint(0, maxWeight), rand.randint(0, maxValue)))
 
@@ -16,28 +15,24 @@ def createBaggage(number, maxWeight, maxValue):
 
 
 def genomCreate(number):
-
     sack = []
-    for i in range(1, number+1):
-        sack.append(rand.randint(0, 1))
+    for i in range(1, number + 1):
+        sack.append(rand.randint(0, 9))
 
     return gap.genom(sack, 0)
 
 
 def calculateWeightAndValue(sack, baggageData):
-
     sumWeight = 0
     sumValue = 0
     for i in range(0, len(sack)):
-        if sack[i] == 1:
-            sumWeight += baggageData[i].getWeight()
-            sumValue += baggageData[i].getValue()
+        sumWeight += baggageData[i].getWeight() * sack[i]
+        sumValue += baggageData[i].getValue() * sack[i]
 
     return [sumWeight, sumValue]
 
 
 def evalGenom(genom, limit, baggageData):
-
     evaluation = calculateWeightAndValue(genom.getData(), baggageData)
     if evaluation[0] > limit:
         evaluation[1] = 0
@@ -92,7 +87,7 @@ def mutation(genoms, perMutation_I, perMutation_G):
             mutationGenom = []
             for j in i.getData():
                 if perMutation_G > (float)(rand.randint(0, 100) / 100):
-                    mutationGenom.append(-1 * (j - 1))
+                    mutationGenom.append(rand.randint(0, 9))
                 else:
                     mutationGenom.append(j)
                 i.setData(mutationGenom)
@@ -102,8 +97,8 @@ def mutation(genoms, perMutation_I, perMutation_G):
     return mutations
 
 
-def main(number, population, limit, maxWeight, maxValue,
-         maxChange, perMutation_G, perMutaiton_I, roopCount):
+def main(number, population, limit, maxWeight, maxValue, maxChange,
+         perMutation_G, perMutaiton_I, roopCount):
 
     currentGroup = []
     baggageData = createBaggage(number, maxWeight, maxValue)
@@ -111,7 +106,7 @@ def main(number, population, limit, maxWeight, maxValue,
     for i in range(population):
         currentGroup.append(genomCreate(number))
 
-    for count_ in range(1, roopCount+1):
+    for count_ in range(1, roopCount + 1):
         nextGroup = []
         for i in range(population):
             evalResult = evalGenom(currentGroup[i], limit, baggageData)
@@ -141,7 +136,7 @@ def main(number, population, limit, maxWeight, maxValue,
 
     print("---荷物一覧---")
     for i in range(len(baggageData)):
-        print(i+1, "番めの荷物")
+        print(i + 1, "番めの荷物")
         print("重さ: ", baggageData[i].getWeight())
         print("価格: ", baggageData[i].getValue())
 
@@ -149,5 +144,6 @@ def main(number, population, limit, maxWeight, maxValue,
     print(eliteGroup[0].getData())
     print(eliteGroup[0].getEval())
 
+
 if __name__ == "__main__":
-    main(5, 50, 100, 100, 200, 10, 0.001, 0.002, 20)
+    main(10, 50, 10000, 100, 200, 10, 0.001, 0.002, 1000)

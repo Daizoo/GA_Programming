@@ -1,24 +1,53 @@
+#! python
+
+import makeLabylinth as ml
 import genomPara as gp
 import random as rand
 
 
-# 遺伝子生成を行う関数
+def evalGenom(control, laby, start):
+    count = 0
+    y = start[0]
+    x = start[1]
+    for i in range(len(control)):
+        command = control[i]
+
+        if laby[y][x] == 'G':
+            return count
+        else:
+            count += 1
+
+        if command is 0:
+            if y - 1 >= 0 and laby[y - 1][x] != '*':
+                y = y - 1
+                x = x
+        elif command is 1:
+            if y + 1 < len(laby) and laby[y + 1][x] != '*':
+                y = y + 1
+                x = x
+        elif command is 2:
+            if x - 1 >= 0 and laby[y][x - 1] != '*':
+                y = y
+                x = x - 1
+        else:
+            if x + 1 < len(laby[y]) and laby[y][x + 1] != '*':
+                y = y
+                x = x + 1
+
+    return len(control) + 1
+
+
 def genomCreate(length):
-    genomData = []
-    for i in range(length):
-        genomData.append(rand.randint(0, 9))
-    return gp.genom(genomData, 0)
+    data = []
+    for i in range(0, length):
+        data.append(rand.randint(0, 3))
 
-
-# 遺伝子の評価値を返す関数
-def evalGenom(genom):
-    total = sum(genom.getData())
-    return total
+    return gp.genom(data, 0)
 
 
 # 遺伝子の選択を行う関数
 def genomSelect(genomPop, maxChange):
-    sortGenom = sorted(genomPop, reverse=True, key=lambda u: u.evaluation)
+    sortGenom = sorted(genomPop, reverse=False, key=lambda u: u.evaluation)
     result = [sortGenom.pop(0) for i in range(maxChange)]
     return result
 
@@ -49,7 +78,7 @@ def genomCross(genom1, genom2, length):
 def nextGenCreate(recentGenom, childGenom, eliteGenom):
     nextGenGenoms = []
     nextGenGenoms = sorted(
-        recentGenom, reverse=False, key=lambda u: u.evaluation)
+        recentGenom, reverse=True, key=lambda u: u.evaluation)
     del nextGenGenoms[0:len(eliteGenom) + len(childGenom)]
     nextGenGenoms.extend(eliteGenom)
     nextGenGenoms.extend(childGenom)
@@ -64,7 +93,7 @@ def mutation(genoms, perMutation_I, perMutation_G):
             mutationGenom = []
             for j in i.getData():
                 if perMutation_G > (float)(rand.randint(0, 100) / 100):
-                    mutationGenom.append(rand.randint(0, 9))
+                    mutationGenom.append(rand.randint(0, 3))
                 else:
                     mutationGenom.append(j)
                 i.setData(mutationGenom)
@@ -74,16 +103,17 @@ def mutation(genoms, perMutation_I, perMutation_G):
     return mutations
 
 
-def main(genomLength, population, maxChange, perMutation_G, perMutaiton_I,
+def main(genomLength, population, labylinth, maxChange, perMutation_G, perMutaiton_I,
          roopCount):
     currentGroup = []
+    start = ml.searchStart(labylinth)
     for i in range(population):
         currentGroup.append(genomCreate(genomLength))
 
     for count_ in range(1, roopCount):
         nextGroup = []
         for i in range(population):
-            evalResult = evalGenom(currentGroup[i])
+            evalResult = evalGenom(currentGroup[i].getData(), labylinth, start)
             currentGroup[i].setEval(evalResult)
 
         eliteGroup = genomSelect(currentGroup, maxChange)
@@ -103,14 +133,17 @@ def main(genomLength, population, maxChange, perMutation_G, perMutaiton_I,
         Ave = sum(fits) / (int)(len(fits))
 
         print("第", count_, "世代の結果\n")
-        print("Max:", Max, "\n")
         print("Min:", Min, "\n")
+        print("Max:", Max, "\n")
         print("Ave:", Ave, "\n")
         currentGroup = nextGroup
 
     print("最優秀個体:")
     print(eliteGroup[0].getData())
+    print("行動数:", eliteGroup[0].getEval())
 
 
 if __name__ == '__main__':
-    main(100, 100, 20, 0.001, 0.001, 10000)
+    data = ml.makeLabylinth('testData.txt')
+    size = ml.countElements(data)
+    main(size, 100, data, 20, 0.01, 0.01, 10001)
