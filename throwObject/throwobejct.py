@@ -1,5 +1,5 @@
-from calcPoint import calcPoint
-import genomPara as gp
+from throwObject import calcPoint as cp
+from throwObject import genomPara as gp
 from random import randint
 
 
@@ -17,7 +17,7 @@ def evalGenom(genom, point):
     degree = data[3] * 10 + data[4] + data[5] * 0.1 * data[6] * 0.01
     init_v = data[7] + data[8] * 0.1 + data[9] * 0.1
 
-    evaluation = calcPoint(init_y, point, degree, init_v)
+    evaluation = cp.calcPoint(init_y, point, degree, init_v)
     return evaluation
 
 
@@ -82,6 +82,8 @@ def mutation(genoms, perMutation_I, perMutation_G):
 def main(point, population, maxChange, perMutation_G, perMutaiton_I,
          roopCount):
     currentGroup = []
+    x = []
+    y = []
     for i in range(population):
         currentGroup.append(genomCreate())
 
@@ -97,6 +99,8 @@ def main(point, population, maxChange, perMutation_G, perMutaiton_I,
         for i in range(0, maxChange):
             childGenom.extend(
                 genomCross(eliteGroup[i - 1], eliteGroup[i], 10))
+        nextGroup = nextGenCreate(currentGroup, childGenom, eliteGroup)
+        nextGroup = mutation(nextGroup, perMutaiton_I, perMutation_G)
 
         fits = sorted(currentGroup, reverse=False, key=lambda u: u.evaluation[1])
         fits = sorted(fits, reverse=False, key=lambda u: u.evaluation[2])
@@ -105,16 +109,18 @@ def main(point, population, maxChange, perMutation_G, perMutaiton_I,
         Max = fits[-1]
 
         print("第", count_, "世代の結果\n")
-        print("最小距離: ", Min.evaluation[0], " | 目標との差:", Min.evaluation[2])
+        print("位置: ", Min.evaluation[0], " | 目標との差(最小):", Min.evaluation[2])
         print("地表からの差: ", Min.evaluation[1], "\n")
-        print("最大距離: ", Max.evaluation[0], " | 目標との差: ", Max.evaluation[2])
+        print("位置: ", Max.evaluation[0], " | 目標との差(最大): ", Max.evaluation[2])
         print("地表からの差: ", Max.evaluation[1], "\n")
-        nextGroup = nextGenCreate(currentGroup, childGenom, eliteGroup)
-        nextGroup = mutation(nextGroup, perMutaiton_I, perMutation_G)
+        data = eliteGroup[0].getEval()
+        x.append(count_)
+        y.append(data[2])
         currentGroup = nextGroup
 
     print("最優秀個体:")
     print(eliteGroup[0].getData())
+    return [x, y]
 
 
 if __name__ == '__main__':

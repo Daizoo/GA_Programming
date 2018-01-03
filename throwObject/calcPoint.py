@@ -6,7 +6,7 @@ def calcPoint(init_y, dist, degree, init_v):
     x = 0
     t = 0
     G = 9.8
-    fps = 1.0 / 100.0
+    fps = 1.0 / 1000.0
     theta = radians(degree)
 
     while y > 0:

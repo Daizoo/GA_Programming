@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from OneMax import genomPara as gp
 import random as rand
 
@@ -79,10 +80,12 @@ def main(genomLength, population, maxChange, perMutation_G, perMutaiton_I,
     currentGroup = []
     x = []
     y = []
+    count_ = 0
     for i in range(population):
         currentGroup.append(genomCreate(genomLength))
 
-    for count_ in range(1, roopCount):
+    while True:
+        count_ += 1
         nextGroup = []
         for i in range(population):
             evalResult = evalGenom(currentGroup[i])
@@ -100,22 +103,19 @@ def main(genomLength, population, maxChange, perMutation_G, perMutaiton_I,
 
         fits = [i.getEval() for i in currentGroup]
 
-        Min = min(fits)
-        Max = max(fits)
-        Ave = sum(fits) / (int)(len(fits))
-
-        print("第", count_, "世代の結果\n")
-        print("Max:", Max, "\n")
-        print("Min:", Min, "\n")
-        print("Ave:", Ave, "\n")
         x.append(count_)
         y.append(eliteGroup[0].getEval())
-        currentGroup = nextGroup
+        if count_ is 1:
+            fig, ax = plt.subplots(1, 1)
+            lines, = ax.plot(x, y)
+        else:
+            lines.set_data(x, y)
+            ax.set_xlim((0, count_))
+            ax.set_ylim(min(y), max(y) + 10)
+            plt.pause(0.01)
 
-    print("最優秀個体:")
-    print(eliteGroup[0].getData())
-    return[x, y]
+        currentGroup = nextGroup
 
 
 if __name__ == '__main__':
-    main(100, 100, 20, 0.001, 0.001, 10000)
+    main(10, 100, 20, 0.001, 0.001, 100)

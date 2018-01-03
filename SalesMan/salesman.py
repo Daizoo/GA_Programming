@@ -1,6 +1,6 @@
-import genomPara as gp
-from samePartChange import samePartChange
-import genRoute as gr
+from SalesMan import genomPara as gp
+from SalesMan import samePartChange as spc
+from SalesMan import genRoute as gr
 import random as rand
 
 
@@ -29,7 +29,7 @@ def genomSelect(genomPop, maxChange):
 
 
 def genomCross(genom1, genom2, length):
-    return samePartChange(genom1, genom2, length)
+    return spc.samePartChange(genom1, genom2, length)
 
 
 def nextGenCreate(recentGenom, childGenom, eliteGenom):
@@ -43,18 +43,15 @@ def nextGenCreate(recentGenom, childGenom, eliteGenom):
     return nextGenGenoms
 
 
-def mutation(genoms, perMutation_I, perMutation_G):
+def mutation(genoms, perMutation_I, perMutation_G, number):
     mutations = []
     for i in genoms:
         if perMutation_I > (float)(rand.randint(0, 100) / 100):
             mutationGenom = i.getData()
             for j in range(0, len(mutationGenom)):
                 if perMutation_G > (float)(rand.randint(0, 100) / 100):
-                    change = rand.sample(range(0, len(mutationGenom)), 1)
-                    while j == change[0]:
-                        change = rand.sample(range(0, len(mutationGenom)), 1)
-
-                    mutationGenom[j], mutationGenom[change[0]] = mutationGenom[change[0]], mutationGenom[j]
+                    change = rand.choice(range(0, number))
+                    mutationGenom[j], mutationGenom[change] = mutationGenom[change], mutationGenom[j]
             i.setData(mutationGenom)
         mutations.append(i)
 
@@ -64,6 +61,9 @@ def mutation(genoms, perMutation_I, perMutation_G):
 def main(genomLength, width, length, population, maxChange, perMutation_G, perMutation_I,
          roopCount):
     currentGroup = []
+    best_data = []
+    x = []
+    y = []
     data = gr.genRoute(width, length, genomLength)
     cities = gr.checkDest(data)
     for i in range(population):
@@ -83,7 +83,15 @@ def main(genomLength, width, length, population, maxChange, perMutation_G, perMu
                 genomCross(eliteGroup[i - 1], eliteGroup[i], genomLength))
 
         nextGroup = nextGenCreate(currentGroup, childGenom, eliteGroup)
-        nextGroup = mutation(nextGroup, perMutation_I, perMutation_G)
+        nextGroup = mutation(nextGroup, perMutation_I, perMutation_G, genomLength)
+
+        if count_ is 1:
+            best_data.append(eliteGroup[0].getData())
+            best_data.append(eliteGroup[1].getEval())
+
+        if best_data[1] > eliteGroup[0].getEval():
+            best_data[0] = eliteGroup[0].getData()
+            best_data[1] = eliteGroup[0].getEval()
 
         fits = [i.getEval() for i in currentGroup]
 
@@ -95,12 +103,20 @@ def main(genomLength, width, length, population, maxChange, perMutation_G, perMu
         print("Min:", Min, "\n")
         print("Max:", Max, "\n")
         print("Ave:", Ave, "\n")
+
+        x.append(count_)
+        y.append(eliteGroup[0].evaluation)
+
         currentGroup = nextGroup
 
     print("最優秀個体:")
-    print(eliteGroup[0].getData())
+    print(best_data[0])
+    print(best_data[1])
+    print(cities)
     gr.outputMap(data)
+
+    return [x, y]
 
 
 if __name__ == '__main__':
-    main(10, 5, 5, 100, 20, 0.001, 0.001, 10000)
+    main(10, 10, 10, 100, 20, 0.001, 0.001, 10000)

@@ -1,0 +1,4 @@
+Onemax: 90
+NapSack: 4941
+SalesMan: 42
+ThrowObject: 0.000849803731213683

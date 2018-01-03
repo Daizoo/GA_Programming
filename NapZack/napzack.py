@@ -1,7 +1,5 @@
-#! python
-
-import genomPara as gap
-import baggageObject as bo
+from NapZack import baggageObject as bo
+from NapZack import genomPara as gp
 import random as rand
 
 
@@ -19,7 +17,7 @@ def genomCreate(number):
     for i in range(1, number + 1):
         sack.append(rand.randint(0, 9))
 
-    return gap.genom(sack, 0)
+    return gp.genom(sack, 0)
 
 
 def calculateWeightAndValue(sack, baggageData):
@@ -63,8 +61,8 @@ def genomCross(genom1, genom2, length):
     child_second = second[:cross1] + one[cross1:cross2] + second[cross2:]
 
     # リストに格納して返す
-    child_genom.append(gap.genom(child_one, 0))
-    child_genom.append(gap.genom(child_second, 0))
+    child_genom.append(gp.genom(child_one, 0))
+    child_genom.append(gp.genom(child_second, 0))
 
     return child_genom
 
@@ -102,6 +100,8 @@ def main(number, population, limit, maxWeight, maxValue, maxChange,
 
     currentGroup = []
     baggageData = createBaggage(number, maxWeight, maxValue)
+    x = []
+    y = []
 
     for i in range(population):
         currentGroup.append(genomCreate(number))
@@ -132,6 +132,8 @@ def main(number, population, limit, maxWeight, maxValue, maxChange,
         print("Max:", Max, "\n")
         print("Min:", Min, "\n")
         print("Ave:", Ave, "\n")
+        x.append(count_)
+        y.append(eliteGroup[0].getEval())
         currentGroup = nextGroup
 
     print("---荷物一覧---")
@@ -143,6 +145,7 @@ def main(number, population, limit, maxWeight, maxValue, maxChange,
     print("最優秀個体:")
     print(eliteGroup[0].getData())
     print(eliteGroup[0].getEval())
+    return [x, y]
 
 
 if __name__ == "__main__":

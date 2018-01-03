@@ -1,7 +1,6 @@
 from random import randint
 from random import sample
-import genomPara as gp
-
+from SalesMan import genomPara as gp
 
 
 def samePartChange(parent1, parent2, length):
